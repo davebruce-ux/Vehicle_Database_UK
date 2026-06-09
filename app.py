@@ -62,7 +62,10 @@ else:
         # Display all columns except Clean_Model
         for col in final_df.columns:
             if col != 'Clean_Model':
-                st.write(f"**{col}:** {record[col]}")
+                val = str(record[col])
+                # Only display if the value exists and is not 'nan'
+                if val.lower() != 'nan':
+                    st.markdown(f"**{col}:** {val}")
         
     else:
         # LIST VIEW for multiple results
