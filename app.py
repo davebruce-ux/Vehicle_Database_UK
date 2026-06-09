@@ -31,18 +31,21 @@ with col2:
 
 # --- PAGE LOGIC ---
 if not st.session_state.show_results:
-    # SEARCH SCREEN
-    st.subheader("Search Specs")
-    all_makes = sorted(df['Make'].dropna().unique())
-    selected_make = st.selectbox("MAKE", options=[""] + all_makes)
-    
-    filtered_by_make = df if not selected_make else df[df['Make'] == selected_make]
-    available_models = sorted(filtered_by_make['Clean_Model'].unique())
-    selected_model = st.selectbox("MODEL", options=[""] + available_models)
-    
-    filtered_by_model = filtered_by_make if not selected_model else filtered_by_make[filtered_by_model['Clean_Model'] == selected_model]
-    available_years = sorted(filtered_by_model['Year Range'].unique())
-    selected_year = st.selectbox("YEAR RANGE", options=[""] + available_years)
+    # --- SEARCH BOXES ---
+# 1. MAKE
+all_makes = sorted(df['Make'].dropna().unique())
+selected_make = st.selectbox("MAKE", options=[""] + all_makes)
+
+# 2. MODEL (Filtered by Make)
+filtered_by_make = df if not selected_make else df[df['Make'] == selected_make]
+available_models = sorted(filtered_by_make['Clean_Model'].unique())
+selected_model = st.selectbox("MODEL", options=[""] + available_models)
+
+# 3. YEAR RANGE (Filtered by Make and Model)
+# FIXED: The line below now correctly references 'filtered_by_make'
+filtered_by_model = filtered_by_make if not selected_model else filtered_by_make[filtered_by_make['Clean_Model'] == selected_model]
+available_years = sorted(filtered_by_model['Year Range'].unique())
+selected_year = st.selectbox("YEAR RANGE", options=[""] + available_years)
 
     _, col_mid, _ = st.columns([1, 2, 1])
     with col_mid:
