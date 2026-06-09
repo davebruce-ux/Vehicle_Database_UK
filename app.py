@@ -17,11 +17,19 @@ st.markdown("""
         font-weight: bold; 
     }
     
-    /* Results List Buttons - Dark Gray/Neutral */
+    /* Results List Buttons - Dark Gray */
     div[data-testid="stButton"] button { 
         background-color: #333333 !important; 
         color: white !important;
         border: 1px solid #555555;
+    }
+
+    /* Enlarged Header Style for Detail View */
+    .result-header {
+        font-size: 1.25em !important;
+        color: #f6782a !important;
+        font-weight: bold;
+        margin-bottom: -10px !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -34,7 +42,7 @@ def load_data():
 
 df = load_data()
 
-# Initialize session state for navigation
+# Initialize session state
 if 'show_results' not in st.session_state:
     st.session_state.show_results = False
 
@@ -58,7 +66,7 @@ if not st.session_state.show_results:
     available_years = sorted(filtered_by_model['Year Range'].unique())
     selected_year = st.selectbox("YEAR RANGE", options=[""] + available_years)
 
-    # --- CENTRALIZED SEARCH BUTTON ---
+    # Centralized Search Button
     spacer_left, col_mid, spacer_right = st.columns([1, 2, 1])
     with col_mid:
         if st.button("🔍 SEARCH SPECS", use_container_width=True):
@@ -78,7 +86,8 @@ else:
             if col != 'Clean_Model':
                 val = str(record[col])
                 if val.lower() != 'nan':
-                    st.markdown(f"**{col}:** {val}")
+                    st.markdown(f'<p class="result-header">{col}:</p> {val}', unsafe_allow_html=True)
+                    st.write("") # Add a little breathing room
         
     else:
         # LIST VIEW
