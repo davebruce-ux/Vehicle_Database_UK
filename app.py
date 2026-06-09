@@ -8,6 +8,7 @@ st.markdown("""
     <style>
     .stApp { background-color: #000000; color: #ffffff; }
     h1, h2, h3, h4, p, label { color: #ffffff !important; }
+    div.stButton > button { background-color: #f6782a !important; color: white !important; width: 100%; font-weight: bold; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -20,38 +21,31 @@ def load_data():
 df = load_data()
 
 # --- HEADER ---
-# --- HEADER ---
-# We set the column ratios to 1, 4, 1 to make the middle column (where the logo sits) 
-# wider and aligned with the search box container
 col1, col2, col3 = st.columns([1, 4, 1]) 
-
 with col2:
-    # use_container_width=True forces the image to span the full width of col2
     st.image("WhatsApp Image 2026-06-09 at 15.53.35.jpeg", use_container_width=True)
 
 st.subheader("Search Specs")
 
-# --- DYNAMIC SEARCH LOGIC ---
-
-# 1. Start with the full list of makes
+# --- SEARCH BOXES ---
 all_makes = sorted(df['Make'].dropna().unique())
 selected_make = st.selectbox("MAKE", options=[""] + all_makes)
 
-# 2. Filter models based on the selected make
 filtered_by_make = df if not selected_make else df[df['Make'] == selected_make]
 available_models = sorted(filtered_by_make['Clean_Model'].unique())
 selected_model = st.selectbox("MODEL", options=[""] + available_models)
 
-# 3. Filter years based on the selected make AND model
-filtered_by_model = filtered_by_make if not selected_model else filtered_by_make[filtered_by_make['Clean_Model'] == selected_model]
+filtered_by_model = filtered_by_make if not selected_model else filtered_by_make[filtered_by_model['Clean_Model'] == selected_model]
 available_years = sorted(filtered_by_model['Year Range'].unique())
 selected_year = st.selectbox("YEAR RANGE", options=[""] + available_years)
 
-# --- RESULTS DISPLAY ---
-st.divider()
-final_df = filtered_by_model
-if selected_year:
-    final_df = final_df[final_df['Year Range'] == selected_year]
-
-st.subheader(f"Results ({len(final_df)})")
-st.dataframe(final_df.drop(columns=['Clean_Model']), use_container_width=True)
+# --- SEARCH BUTTON ---
+# The results will only trigger when this button is clicked
+if st.button("🔍 SEARCH SPECS"):
+    if selected_make and selected_model and selected_year:
+        st.divider()
+        final_df = filtered_by_model[filtered_by_model['Year Range'] == selected_year]
+        st.subheader("Results")
+        st.dataframe(final_df.drop(columns=['Clean_Model']), use_container_width=True)
+    else:
+        st.warning("Please select a Make, Model, and Year Range to search.")
