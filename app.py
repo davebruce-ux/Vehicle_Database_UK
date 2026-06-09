@@ -19,7 +19,7 @@ st.markdown("""
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
     st.image("641c5719-41d0-40ec-adc9-eb3a3e763903.png", width=200)
-    st.caption("VEHICLE LIBRARY")
+    st.caption(        "VEHICLE LIBRARY")
 
 # --- LOAD DATA ---
 @st.cache_data(ttl=60)
