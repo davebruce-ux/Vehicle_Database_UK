@@ -20,9 +20,14 @@ def load_data():
 df = load_data()
 
 # --- HEADER ---
-col1, col2, col3 = st.columns([1, 2, 1])
+# --- HEADER ---
+# We set the column ratios to 1, 4, 1 to make the middle column (where the logo sits) 
+# wider and aligned with the search box container
+col1, col2, col3 = st.columns([1, 4, 1]) 
+
 with col2:
-    st.image("WhatsApp Image 2026-06-09 at 15.53.35.jpeg", width=200)
+    # use_container_width=True forces the image to span the full width of col2
+    st.image("WhatsApp Image 2026-06-09 at 15.53.35.jpeg", use_container_width=True)
 
 st.subheader("Search Specs")
 
