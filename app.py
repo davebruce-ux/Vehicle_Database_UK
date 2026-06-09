@@ -87,12 +87,18 @@ else:
             if col != 'Clean_Model':
                 val = str(record[col])
                 
+                # Check for empty/nan fields
                 if val.lower() == 'nan' or val.strip() == "":
                     st.markdown(f'<p class="result-header">{col}:</p>', unsafe_allow_html=True)
                     
-                    # Check if it's a photo field
                     if "Photo" in col or "Jacking" in col:
-                        photo_file = st.camera_input(f"Capture {col}")
+                        choice = st.radio(f"Action for {col}:", ["---", "Upload Photo", "Take New Photo"], key=f"radio_{row_id}_{col}")
+                        photo_file = None
+                        if choice == "Upload Photo":
+                            photo_file = st.file_uploader(f"Choose file for {col}", type=['jpg', 'png'], key=f"up_{row_id}_{col}")
+                        elif choice == "Take New Photo":
+                            photo_file = st.camera_input(f"Camera for {col}", key=f"cam_{row_id}_{col}")
+                        
                         if photo_file:
                             os.makedirs("uploads", exist_ok=True)
                             file_path = f"uploads/{row_id}_{col}.jpg"
