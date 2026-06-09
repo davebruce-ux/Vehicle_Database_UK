@@ -7,19 +7,34 @@ st.set_page_config(page_title="Recovery Specs", layout="centered")
 # --- CUSTOM CSS FOR BRANDING ---
 st.markdown("""
     <style>
-    .stApp { background-color: #0e0e0e; color: white; }
-    div.stButton > button { background-color: #f6782a; color: white; width: 100%; border: none; }
+    /* Change main background to black */
+    .stApp { 
+        background-color: #000000; 
+        color: #ffffff; 
+    }
+    
+    /* Style headers to be white */
+    h1, h2, h3, h4, p, label { 
+        color: #ffffff !important; 
+    }
+    
+    /* Make search boxes look better against black */
+    input { 
+        background-color: #1c1c1c !important; 
+        color: white !important; 
+        border: 1px solid #333 !important; 
+    }
+    
+    /* Make the button orange and bold */
+    div.stButton > button { 
+        background-color: #f6782a !important; 
+        color: white !important; 
+        font-weight: bold;
+        width: 100%; 
+        border: none; 
+    }
     </style>
 """, unsafe_allow_html=True)
-
-# --- HEADER ---
-# Note: Ensure your logo file is in the repository!
-try:
-    st.image("641c5719-41d0-40ec-adc9-eb3a3e763903.png", width=200)
-except:
-    st.title("RECOVERY SPECS")
-
-st.caption("FIELD LOOKUP // VEHICLE LIBRARY")
 
 # --- LOAD DATA ---
 @st.cache_data(ttl=60)
