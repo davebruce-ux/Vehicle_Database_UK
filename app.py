@@ -2,30 +2,60 @@ import streamlit as st
 import pandas as pd
 import re
 
-# ... (Include your existing config and load_data function here)
+# --- CONFIG ---
+st.set_page_config(page_title="Recovery Specs", layout="centered")
+st.markdown("""
+    <style>
+    .stApp { background-color: #000000; color: #ffffff; }
+    h1, h2, h3, h4, p, label { color: #ffffff !important; }
+    div.stButton > button { background-color: #f6782a !important; color: white !important; width: 100%; font-weight: bold; }
+    </style>
+""", unsafe_allow_html=True)
 
-# --- SEARCH BUTTON MODAL ---
-if st.button("🔍 SEARCH SPECS"):
-    # Filter the data
-    results = df.copy()
-    if selected_make: results = results[results['Make'] == selected_make]
-    if selected_model: results = results[results['Clean_Model'] == selected_model]
-    if selected_year: results = results[results['Year Range'] == selected_year]
+@st.cache_data(ttl=60)
+def load_data():
+    df = pd.read_excel("Vehicle_Library_Populated.xlsx")
+    df['Clean_Model'] = df['Model'].apply(lambda x: re.sub(r'\s*\(.*?\)', '', str(x)).strip())
+    return df
+
+df = load_data()
+
+# Initialize session state for navigation
+if 'show_results' not in st.session_state:
+    st.session_state.show_results = False
+
+# --- HEADER (Always visible) ---
+col1, col2, col3 = st.columns([1, 4, 1]) 
+with col2:
+    st.image("WhatsApp Image 2026-06-09 at 15.53.35.jpeg", use_container_width=True)
+
+# --- PAGE LOGIC ---
+if not st.session_state.show_results:
+    # SEARCH SCREEN
+    st.subheader("Search Specs")
+    all_makes = sorted(df['Make'].dropna().unique())
+    selected_make = st.selectbox("MAKE", options=[""] + all_makes)
     
-    # Store results in session state
-    st.session_state.results = results
-    st.session_state.show_results = True
+    filtered_by_make = df if not selected_make else df[df['Make'] == selected_make]
+    available_models = sorted(filtered_by_make['Clean_Model'].unique())
+    selected_model = st.selectbox("MODEL", options=[""] + available_models)
+    
+    filtered_by_model = filtered_by_make if not selected_model else filtered_by_make[filtered_by_model['Clean_Model'] == selected_model]
+    available_years = sorted(filtered_by_model['Year Range'].unique())
+    selected_year = st.selectbox("YEAR RANGE", options=[""] + available_years)
 
-# --- MODAL DISPLAY ---
-if st.session_state.get("show_results"):
-    @st.dialog("Search Results")
-    def show_modal():
-        if not st.session_state.results.empty:
-            st.dataframe(st.session_state.results.drop(columns=['Clean_Model']), use_container_width=True)
-        else:
-            st.error("No results found.")
-        if st.button("Close"):
-            st.session_state.show_results = False
+    _, col_mid, _ = st.columns([1, 2, 1])
+    with col_mid:
+        if st.button("🔍 SEARCH SPECS"):
+            st.session_state.results = filtered_by_model[filtered_by_model['Year Range'] == selected_year] if selected_year else filtered_by_model
+            st.session_state.show_results = True
             st.rerun()
 
-    show_modal()
+else:
+    # RESULTS SCREEN
+    st.subheader("Results")
+    st.dataframe(st.session_state.results.drop(columns=['Clean_Model']), use_container_width=True)
+    
+    if st.button("⬅ Back to Search"):
+        st.session_state.show_results = False
+        st.rerun()
