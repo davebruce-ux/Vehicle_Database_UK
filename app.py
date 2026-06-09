@@ -24,7 +24,7 @@ df = load_data()
 if 'show_results' not in st.session_state:
     st.session_state.show_results = False
 
-# --- HEADER (Always visible) ---
+# --- HEADER ---
 col1, col2, col3 = st.columns([1, 4, 1]) 
 with col2:
     st.image("WhatsApp Image 2026-06-09 at 15.53.35.jpeg", use_container_width=True)
@@ -53,8 +53,6 @@ if not st.session_state.show_results:
 
 else:
     # --- RESULTS SCREEN ---
-else:
-    # Logic to filter data before showing results
     final_df = st.session_state.results
 
     if len(final_df) == 1:
