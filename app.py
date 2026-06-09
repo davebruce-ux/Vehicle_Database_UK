@@ -28,24 +28,34 @@ with col2:
 st.subheader("Search Specs")
 
 # --- SEARCH BOXES ---
+# 1. MAKE
 all_makes = sorted(df['Make'].dropna().unique())
 selected_make = st.selectbox("MAKE", options=[""] + all_makes)
 
+# 2. MODEL (Filtered by Make)
 filtered_by_make = df if not selected_make else df[df['Make'] == selected_make]
 available_models = sorted(filtered_by_make['Clean_Model'].unique())
 selected_model = st.selectbox("MODEL", options=[""] + available_models)
 
-filtered_by_model = filtered_by_make if not selected_model else filtered_by_make[filtered_by_model['Clean_Model'] == selected_model]
+# 3. YEAR RANGE (Filtered by Make and Model)
+filtered_by_model = filtered_by_make if not selected_model else filtered_by_make[filtered_by_make['Clean_Model'] == selected_model]
 available_years = sorted(filtered_by_model['Year Range'].unique())
 selected_year = st.selectbox("YEAR RANGE", options=[""] + available_years)
 
 # --- SEARCH BUTTON ---
-# The results will only trigger when this button is clicked
 if st.button("🔍 SEARCH SPECS"):
-    if selected_make and selected_model and selected_year:
-        st.divider()
-        final_df = filtered_by_model[filtered_by_model['Year Range'] == selected_year]
-        st.subheader("Results")
-        st.dataframe(final_df.drop(columns=['Clean_Model']), use_container_width=True)
+    # Filter the data based on whatever is selected
+    results = df.copy()
+    if selected_make:
+        results = results[results['Make'] == selected_make]
+    if selected_model:
+        results = results[results['Clean_Model'] == selected_model]
+    if selected_year:
+        results = results[results['Year Range'] == selected_year]
+    
+    st.divider()
+    if not results.empty:
+        st.subheader(f"Found {len(results)} Result(s)")
+        st.dataframe(results.drop(columns=['Clean_Model']), use_container_width=True)
     else:
-        st.warning("Please select a Make, Model, and Year Range to search.")
+        st.error("No results found for that combination.")
