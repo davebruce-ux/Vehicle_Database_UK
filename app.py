@@ -43,7 +43,13 @@ available_years = sorted(filtered_by_model['Year Range'].unique())
 selected_year = st.selectbox("YEAR RANGE", options=[""] + available_years)
 
 # --- SEARCH BUTTON ---
-if st.button("🔍 SEARCH SPECS"):
+# We use columns [1, 2, 1] to create a centered block for the button
+_, col_mid, _ = st.columns([1, 2, 1])
+
+with col_mid:
+    search_clicked = st.button("🔍 SEARCH SPECS", use_container_width=True)
+
+if search_clicked:
     # Filter the data based on whatever is selected
     results = df.copy()
     if selected_make:
