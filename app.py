@@ -5,7 +5,7 @@ import pandas as pd
 st.set_page_config(page_title="Recovery Specs Pro", layout="wide")
 
 # --- ADD LOGO ---
-st.image("641c5719-41d0-40ec-adc9-eb3a3e763903.png", width=300)
+# st.image("641c5719-41d0-40ec-adc9-eb3a3e763903.png", width=300)
 
 st.title("🚗 Recovery Specs - Field Operations")
 
