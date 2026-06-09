@@ -1,11 +1,12 @@
 import streamlit as st
 import pandas as pd
 
+# --- CONFIG (Must be the first Streamlit command) ---
+st.set_page_config(page_title="Recovery Specs Pro", layout="wide")
+
 # --- ADD LOGO ---
 st.image("641c5719-41d0-40ec-adc9-eb3a3e763903.png", width=300)
 
-# --- CONFIG ---
-st.set_page_config(page_title="Recovery Specs Pro", layout="wide")
 st.title("🚗 Recovery Specs - Field Operations")
 
 # --- LOAD DATA ---
@@ -36,13 +37,17 @@ try:
     st.subheader("📝 Add Field Notes/Photos")
     st.write("Use this section to record details for future reference.")
     
-    selected_vehicle = st.selectbox("Select Vehicle to update:", filtered_df['Make'] + " " + filtered_df['Model'])
-    comment = st.text_area("Technician Comments:")
-    photo_url = st.text_input("Photo Link (or notes):")
+    # Check if results exist before creating selectbox
+    if not filtered_df.empty:
+        selected_vehicle = st.selectbox("Select Vehicle to update:", filtered_df['Make'].astype(str) + " " + filtered_df['Model'].astype(str))
+        comment = st.text_area("Technician Comments:")
+        photo_url = st.text_input("Photo Link (or notes):")
 
-    if st.button("Submit Update"):
-        st.success(f"Update submitted for {selected_vehicle}!")
-        st.info("Note: To save this data permanently to your Master Sheet, ensure your app is connected to a live Google Sheet via 'gspread'.")
+        if st.button("Submit Update"):
+            st.success(f"Update submitted for {selected_vehicle}!")
+            st.info("Note: To save this data permanently to your Master Sheet, ensure your app is connected to a live Google Sheet via 'gspread'.")
+    else:
+        st.warning("No vehicles found to update.")
 
 except Exception as e:
     st.error(f"Error loading data: {e}")
