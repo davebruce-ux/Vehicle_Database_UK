@@ -27,14 +27,13 @@ st.markdown("""
         font-size: 1.25em !important;
         color: #f6782a !important;
         font-weight: bold;
-        margin-bottom: -10px !important;
+        margin-bottom: -5px !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
 @st.cache_data(ttl=60)
 def load_data():
-    # Ensure file exists
     if not os.path.exists("Vehicle_Library_Populated.xlsx"):
         st.error("Excel file not found!")
         return pd.DataFrame()
@@ -81,7 +80,7 @@ else:
     if len(final_df) == 1:
         st.subheader("Vehicle Details")
         record = final_df.iloc[0]
-        row_id = record.name # Get index
+        row_id = record.name 
         
         updated = False
         for col in final_df.columns:
@@ -90,13 +89,28 @@ else:
                 
                 if val.lower() == 'nan' or val.strip() == "":
                     st.markdown(f'<p class="result-header">{col}:</p>', unsafe_allow_html=True)
-                    new_val = st.text_input(f"Enter info for {col}", key=f"inp_{col}")
-                    if new_val:
-                        st.session_state.df.at[row_id, col] = new_val
-                        updated = True
+                    
+                    # Check if it's a photo field
+                    if "Photo" in col or "Jacking" in col:
+                        photo_file = st.camera_input(f"Capture {col}")
+                        if photo_file:
+                            os.makedirs("uploads", exist_ok=True)
+                            file_path = f"uploads/{row_id}_{col}.jpg"
+                            with open(file_path, "wb") as f:
+                                f.write(photo_file.getbuffer())
+                            st.session_state.df.at[row_id, col] = file_path
+                            updated = True
+                    else:
+                        new_val = st.text_input(f"Add note for {col}", key=f"inp_{col}")
+                        if new_val:
+                            st.session_state.df.at[row_id, col] = new_val
+                            updated = True
                 else:
-                    st.markdown(f'<p class="result-header">{col}:</p> {val}', unsafe_allow_html=True)
-                    st.write("") 
+                    st.markdown(f'<p class="result-header">{col}:</p>', unsafe_allow_html=True)
+                    if str(val).startswith("uploads/"):
+                        st.image(val, use_container_width=True)
+                    else:
+                        st.write(val)
         
         if updated:
             if st.button("💾 Save Changes to Database"):
