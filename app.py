@@ -61,6 +61,7 @@ else:
         # VERTICAL VIEW for single result
         st.subheader("Vehicle Details")
         record = final_df.iloc[0]
+        # Display all columns except Clean_Model
         for col in final_df.columns:
             if col != 'Clean_Model':
                 st.write(f"**{col}:** {record[col]}")
@@ -70,15 +71,17 @@ else:
         st.subheader(f"Found {len(final_df)} Results")
         st.write("Select a vehicle to view details:")
         
-        # Display clickable list using a form or buttons
+        # Display clickable list using buttons
         for idx, row in final_df.iterrows():
             label = f"{row['Make']} | {row['Model']} | {row['Year Range']}"
-            if st.button(label, key=idx):
+            if st.button(label, key=f"btn_{idx}"):
                 # Update session state to show ONLY this specific row
                 st.session_state.results = final_df.loc[[idx]]
                 st.rerun()
 
     # Back button
+    st.divider()
     if st.button("⬅ Back to Search"):
         st.session_state.show_results = False
         st.rerun()
+        
