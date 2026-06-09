@@ -8,14 +8,12 @@ st.markdown("""
     <style>
     .stApp { background-color: #000000; color: #ffffff; }
     h1, h2, h3, h4, p, label { color: #ffffff !important; }
-    div.stButton > button { background-color: #f6782a !important; color: white !important; width: 100%; font-weight: bold; }
     </style>
 """, unsafe_allow_html=True)
 
 @st.cache_data(ttl=60)
 def load_data():
     df = pd.read_excel("Vehicle_Library_Populated.xlsx")
-    # Clean models to show just the name (e.g., "Focus")
     df['Clean_Model'] = df['Model'].apply(lambda x: re.sub(r'\s*\(.*?\)', '', str(x)).strip())
     return df
 
@@ -28,28 +26,27 @@ with col2:
 
 st.subheader("Search Specs")
 
-# --- SEARCH BOXES (All visible immediately) ---
-# We use sorted unique values, including an empty string for "All"
+# --- DYNAMIC SEARCH LOGIC ---
+
+# 1. Start with the full list of makes
 all_makes = sorted(df['Make'].dropna().unique())
 selected_make = st.selectbox("MAKE", options=[""] + all_makes)
 
-all_models = sorted(df['Clean_Model'].dropna().unique())
-selected_model = st.selectbox("MODEL", options=[""] + all_models)
+# 2. Filter models based on the selected make
+filtered_by_make = df if not selected_make else df[df['Make'] == selected_make]
+available_models = sorted(filtered_by_make['Clean_Model'].unique())
+selected_model = st.selectbox("MODEL", options=[""] + available_models)
 
-all_years = sorted(df['Year Range'].dropna().unique())
-selected_year = st.selectbox("YEAR RANGE", options=[""] + all_years)
-
-# --- FILTER LOGIC ---
-filtered_df = df.copy()
-
-if selected_make:
-    filtered_df = filtered_df[filtered_df['Make'] == selected_make]
-if selected_model:
-    filtered_df = filtered_df[filtered_df['Clean_Model'] == selected_model]
-if selected_year:
-    filtered_df = filtered_df[filtered_df['Year Range'] == selected_year]
+# 3. Filter years based on the selected make AND model
+filtered_by_model = filtered_by_make if not selected_model else filtered_by_make[filtered_by_make['Clean_Model'] == selected_model]
+available_years = sorted(filtered_by_model['Year Range'].unique())
+selected_year = st.selectbox("YEAR RANGE", options=[""] + available_years)
 
 # --- RESULTS DISPLAY ---
 st.divider()
-st.subheader(f"Results ({len(filtered_df)})")
-st.dataframe(filtered_df.drop(columns=['Clean_Model']), use_container_width=True)
+final_df = filtered_by_model
+if selected_year:
+    final_df = final_df[final_df['Year Range'] == selected_year]
+
+st.subheader(f"Results ({len(final_df)})")
+st.dataframe(final_df.drop(columns=['Clean_Model']), use_container_width=True)
