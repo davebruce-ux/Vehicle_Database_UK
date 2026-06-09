@@ -8,7 +8,21 @@ st.markdown("""
     <style>
     .stApp { background-color: #000000; color: #ffffff; }
     h1, h2, h3, h4, p, label { color: #ffffff !important; }
-    div.stButton > button { background-color: #f6782a !important; color: white !important; width: 100%; font-weight: bold; }
+    
+    /* Main Search Button - Bright Orange */
+    div[data-testid="stVerticalBlock"] div.stButton > button { 
+        background-color: #f6782a !important; 
+        color: white !important; 
+        width: 100%; 
+        font-weight: bold; 
+    }
+    
+    /* Results List Buttons - Dark Gray/Neutral */
+    div[data-testid="stButton"] button { 
+        background-color: #333333 !important; 
+        color: white !important;
+        border: 1px solid #555555;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -45,9 +59,7 @@ if not st.session_state.show_results:
     selected_year = st.selectbox("YEAR RANGE", options=[""] + available_years)
 
     # --- CENTRALIZED SEARCH BUTTON ---
-    # We use columns to create spacers on the left and right
     spacer_left, col_mid, spacer_right = st.columns([1, 2, 1])
-    
     with col_mid:
         if st.button("🔍 SEARCH SPECS", use_container_width=True):
             st.session_state.results = filtered_by_model[filtered_by_model['Year Range'] == selected_year] if selected_year else filtered_by_model
@@ -59,27 +71,23 @@ else:
     final_df = st.session_state.results
 
     if len(final_df) == 1:
-        # VERTICAL VIEW for single result
+        # VERTICAL VIEW
         st.subheader("Vehicle Details")
         record = final_df.iloc[0]
-        # Display all columns except Clean_Model
         for col in final_df.columns:
             if col != 'Clean_Model':
                 val = str(record[col])
-                # Only display if the value exists and is not 'nan'
                 if val.lower() != 'nan':
                     st.markdown(f"**{col}:** {val}")
         
     else:
-        # LIST VIEW for multiple results
+        # LIST VIEW
         st.subheader(f"Found {len(final_df)} Results")
         st.write("Select a vehicle to view details:")
         
-        # Display clickable list using buttons
         for idx, row in final_df.iterrows():
             label = f"{row['Make']} | {row['Model']} | {row['Year Range']}"
-            if st.button(label, key=str(idx)):
-                # Update session state to show ONLY this specific row
+            if st.button(label, key=str(idx), use_container_width=True):
                 st.session_state.results = final_df.loc[[idx]]
                 st.rerun()
 
