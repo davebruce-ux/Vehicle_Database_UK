@@ -44,9 +44,12 @@ if not st.session_state.show_results:
     available_years = sorted(filtered_by_model['Year Range'].unique())
     selected_year = st.selectbox("YEAR RANGE", options=[""] + available_years)
 
-    _, col_mid, _ = st.columns([1, 2, 1])
+    # --- CENTRALIZED SEARCH BUTTON ---
+    # We use columns to create spacers on the left and right
+    spacer_left, col_mid, spacer_right = st.columns([1, 2, 1])
+    
     with col_mid:
-        if st.button("🔍 SEARCH SPECS"):
+        if st.button("🔍 SEARCH SPECS", use_container_width=True):
             st.session_state.results = filtered_by_model[filtered_by_model['Year Range'] == selected_year] if selected_year else filtered_by_model
             st.session_state.show_results = True
             st.rerun()
