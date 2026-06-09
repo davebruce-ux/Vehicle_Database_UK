@@ -4,37 +4,20 @@ import pandas as pd
 # --- CONFIG ---
 st.set_page_config(page_title="Recovery Specs", layout="centered")
 
-# --- CUSTOM CSS FOR BRANDING ---
+# --- CUSTOM CSS ---
 st.markdown("""
     <style>
-    /* Change main background to black */
-    .stApp { 
-        background-color: #000000; 
-        color: #ffffff; 
-    }
-    
-    /* Style headers to be white */
-    h1, h2, h3, h4, p, label { 
-        color: #ffffff !important; 
-    }
-    
-    /* Make search boxes look better against black */
-    input { 
-        background-color: #1c1c1c !important; 
-        color: white !important; 
-        border: 1px solid #333 !important; 
-    }
-    
-    /* Make the button orange and bold */
-    div.stButton > button { 
-        background-color: #f6782a !important; 
-        color: white !important; 
-        font-weight: bold;
-        width: 100%; 
-        border: none; 
-    }
+    .stApp { background-color: #000000; color: #ffffff; }
+    h1, h2, h3, h4, p, label { color: #ffffff !important; }
+    input { background-color: #1c1c1c !important; color: white !important; border: 1px solid #333 !important; }
+    div.stButton > button { background-color: #f6782a !important; color: white !important; font-weight: bold; width: 100%; }
     </style>
 """, unsafe_allow_html=True)
+
+# --- HEADER ---
+# Ensure your logo file is uploaded to the root of your repo
+st.image("641c5719-41d0-40ec-adc9-eb3a3e763903.png", width=200)
+st.caption("FIELD LOOKUP // VEHICLE LIBRARY")
 
 # --- LOAD DATA ---
 @st.cache_data(ttl=60)
