@@ -74,7 +74,7 @@ else:
         # Display clickable list using buttons
         for idx, row in final_df.iterrows():
             label = f"{row['Make']} | {row['Model']} | {row['Year Range']}"
-            if st.button(label, key=f"btn_{idx}"):
+            if st.button(label, key=str(idx)):
                 # Update session state to show ONLY this specific row
                 st.session_state.results = final_df.loc[[idx]]
                 st.rerun()
@@ -84,4 +84,3 @@ else:
     if st.button("⬅ Back to Search"):
         st.session_state.show_results = False
         st.rerun()
-        
