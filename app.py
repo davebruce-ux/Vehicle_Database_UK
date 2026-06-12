@@ -85,13 +85,13 @@ def main():
                     url = "https://script.google.com/macros/s/AKfycbwBAgimuEZD_reXRyS1YETk0Le2-6JiZyYNccQ4fC6RQoLcUwvzTFEAVBBWLH3-jbI6dQ/exec"
                     try:
                         payload = {"make": make, "model": model, "year": year, "details": details}
-                        response = requests.post(url, json=payload)
+                        response = requests.post(url, json=payload, timeout=10)
                         if response.status_code == 200:
-                            st.success("Request sent to management!")
+                            st.success("Request sent successfully!")
                         else:
-                            st.error("Failed to send request.")
+                            st.error(f"Error: Server returned {response.status_code}")
                     except Exception as e:
-                        st.error(f"Error: {e}")
+                        st.error(f"Connection failed: {str(e)}")
     else:
         results = st.session_state.results
         if len(results) == 1:
