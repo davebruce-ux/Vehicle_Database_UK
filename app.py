@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import re
+import requests
 
 # --- CONFIG & STYLING ---
 st.set_page_config(page_title="Recovery Specs", layout="centered")
@@ -79,8 +80,18 @@ def main():
                 model = st.text_input("Model")
                 year = st.text_input("Year Range")
                 details = st.text_area("Details")
+                
                 if st.form_submit_button("Send Request"):
-                    st.success("Request sent to management!")
+                    url = "https://script.google.com/macros/s/AKfycbwBAgimuEZD_reXRyS1YETk0Le2-6JiZyYNccQ4fC6RQoLcUwvzTFEAVBBWLH3-jbI6dQ/exec"
+                    try:
+                        payload = {"make": make, "model": model, "year": year, "details": details}
+                        response = requests.post(url, json=payload)
+                        if response.status_code == 200:
+                            st.success("Request sent to management!")
+                        else:
+                            st.error("Failed to send request.")
+                    except Exception as e:
+                        st.error(f"Error: {e}")
     else:
         results = st.session_state.results
         if len(results) == 1:
