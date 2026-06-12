@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import re
-from streamlit_gsheets import GSheetsConnection
 
 # --- CONFIG ---
 st.set_page_config(page_title="Recovery Specs", layout="centered")
@@ -9,11 +8,12 @@ st.set_page_config(page_title="Recovery Specs", layout="centered")
 # --- DATA HANDLER ---
 @st.cache_data(ttl=600)
 def load_data():
-    conn = st.connection("gsheets", type=GSheetsConnection)
+    # Use native Streamlit connection for Google Sheets
+    conn = st.connection("gsheets", type="gsheets")
     url = "https://docs.google.com/spreadsheets/d/1dTq4EZmYsfl4C8zsNYsT1dRwB37Os9RW/edit"
     df = conn.read(spreadsheet=url, usecols=None)
     
-    # Strip whitespace from column names
+    # Clean column names
     df.columns = df.columns.str.strip()
     return df
 
