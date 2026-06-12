@@ -5,7 +5,6 @@ import re
 # --- CONFIG & STYLING ---
 st.set_page_config(page_title="Recovery Specs", layout="centered")
 
-# Injecting CSS to force dark mode
 st.markdown("""
     <style>
     .stApp { background-color: #000000 !important; }
@@ -16,7 +15,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- DATA HANDLER ---
 @st.cache_data(ttl=600)
 def load_data():
     url = "https://docs.google.com/spreadsheets/d/1dTq4EZmYsfl4C8zsNYsT1dRwB37Os9RW/gviz/tq?tqx=out:csv&sheet=Sheet1"
@@ -24,37 +22,30 @@ def load_data():
     df.columns = df.columns.str.strip()
     return df
 
-# --- MAIN APP ---
 def main():
-    # Logo Display
+    # Logo
     col1, col2, col3 = st.columns([1, 4, 1]) 
     with col2:
-        try:
-            st.image("WhatsApp Image 2026-06-09 at 15.53.35.jpeg", use_container_width=True)
-        except:
-            st.warning("Logo image not found.")
+        st.image("WhatsApp Image 2026-06-09 at 15.53.35.jpeg", use_container_width=True)
 
-    # Load Data
-    try:
-        df = load_data()
-    except Exception as e:
-        st.error(f"Error loading data: {e}")
-        return
-
+    df = load_data()
     if 'Model' in df.columns:
         df['Clean_Model'] = df['Model'].apply(lambda x: re.sub(r'\s*\(.*?\)', '', str(x)).strip())
     
     if 'show_results' not in st.session_state: st.session_state.show_results = False
 
-    # Search Interface
     if not st.session_state.show_results:
         st.subheader("Search Specs")
+        
+        # 1. Filter by Make
         selected_make = st.selectbox("MAKE", options=[""] + sorted(df['Make'].dropna().unique().astype(str)))
         filtered_by_make = df if not selected_make else df[df['Make'] == selected_make]
         
+        # 2. Filter by Model (using filtered_by_make)
         selected_model = st.selectbox("MODEL", options=[""] + sorted(filtered_by_make['Clean_Model'].unique().astype(str)))
-        filtered_by_model = filtered_by_make if not selected_model else filtered_by_make[filtered_by_model['Clean_Model'] == selected_model]
+        filtered_by_model = filtered_by_make if not selected_model else filtered_by_make[filtered_by_make['Clean_Model'] == selected_model]
         
+        # 3. Filter by Year (using filtered_by_model)
         selected_year = st.selectbox("YEAR RANGE", options=[""] + sorted(filtered_by_model['Year Range'].unique().astype(str)))
 
         if st.button("🔍 SEARCH SPECS", use_container_width=True):
@@ -62,7 +53,6 @@ def main():
             st.session_state.show_results = True
             st.rerun()
     else:
-        # Results Logic
         results = st.session_state.results
         if len(results) == 1:
             st.subheader("Vehicle Details")
