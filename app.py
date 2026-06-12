@@ -23,7 +23,6 @@ def load_data():
     return df
 
 def main():
-    # Logo
     col1, col2, col3 = st.columns([1, 4, 1]) 
     with col2:
         st.image("WhatsApp Image 2026-06-09 at 15.53.35.jpeg", use_container_width=True)
@@ -37,21 +36,29 @@ def main():
     if not st.session_state.show_results:
         st.subheader("Search Specs")
         
-        # 1. Filter by Make
         selected_make = st.selectbox("MAKE", options=[""] + sorted(df['Make'].dropna().unique().astype(str)))
         filtered_by_make = df if not selected_make else df[df['Make'] == selected_make]
         
-        # 2. Filter by Model (using filtered_by_make)
         selected_model = st.selectbox("MODEL", options=[""] + sorted(filtered_by_make['Clean_Model'].unique().astype(str)))
-        filtered_by_model = filtered_by_make if not selected_model else filtered_by_make[filtered_by_make['Clean_Model'] == selected_model]
+        filtered_by_model = filtered_by_make if not selected_model else filtered_by_make[filtered_by_model['Clean_Model'] == selected_model]
         
-        # 3. Filter by Year (using filtered_by_model)
         selected_year = st.selectbox("YEAR RANGE", options=[""] + sorted(filtered_by_model['Year Range'].unique().astype(str)))
 
         if st.button("🔍 SEARCH SPECS", use_container_width=True):
             st.session_state.results = filtered_by_model[filtered_by_model['Year Range'] == selected_year] if selected_year else filtered_by_model
             st.session_state.show_results = True
             st.rerun()
+            
+        st.divider()
+        # RE-ADDED: Missing Vehicle Form
+        with st.expander("➕ Report a missing vehicle"):
+            with st.form("new_vehicle_form", clear_on_submit=True):
+                make = st.text_input("Make")
+                model = st.text_input("Model")
+                year = st.text_input("Year Range")
+                details = st.text_area("Details")
+                if st.form_submit_button("Send Request"):
+                    st.success("Request sent to management!")
     else:
         results = st.session_state.results
         if len(results) == 1:
