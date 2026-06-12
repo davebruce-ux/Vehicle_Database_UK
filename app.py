@@ -8,63 +8,69 @@ st.set_page_config(page_title="Recovery Specs", layout="centered")
 # --- DATA HANDLER ---
 @st.cache_data(ttl=600)
 def load_data():
-    # Use native Streamlit connection for Google Sheets
-    conn = st.connection("gsheets", type="gsheets")
-    url = "https://docs.google.com/spreadsheets/d/1dTq4EZmYsfl4C8zsNYsT1dRwB37Os9RW/edit"
-    df = conn.read(spreadsheet=url, usecols=None)
+    # This URL format is a direct CSV export from Google Sheets
+    # It works perfectly with 'Anyone with the link can view'
+    url = "https://docs.google.com/spreadsheets/d/1dTq4EZmYsfl4C8zsNYsT1dRwB37Os9RW/gviz/tq?tqx=out:csv&sheet=Sheet1"
+    df = pd.read_csv(url)
     
-    # Clean column names
+    # Clean column names (removes hidden whitespace)
     df.columns = df.columns.str.strip()
     return df
 
-# --- UI & LOGIC ---
+# --- MAIN APP LOGIC ---
 def main():
-    # Load data
+    # 1. Load data safely
     try:
         df = load_data()
-        # Debugging: show columns if they don't match expected names
-        if not all(col in df.columns for col in ['Make', 'Model', 'Year Range']):
-            st.error(f"Column Mismatch! Expected 'Make', 'Model', 'Year Range'. Found: {df.columns.tolist()}")
-            return
     except Exception as e:
-        st.error(f"Connection Error: {e}")
+        st.error(f"Error loading data: {e}")
         return
 
-    # Clean Model logic
-    df['Clean_Model'] = df['Model'].apply(lambda x: re.sub(r'\s*\(.*?\)', '', str(x)).strip())
+    # 2. Add 'Clean_Model' for searching if 'Model' exists
+    if 'Model' in df.columns:
+        df['Clean_Model'] = df['Model'].apply(lambda x: re.sub(r'\s*\(.*?\)', '', str(x)).strip())
     
-    # Session State
+    # 3. Session State Management
     if 'show_results' not in st.session_state: st.session_state.show_results = False
 
-    # Search Interface
+    # 4. Search UI
     if not st.session_state.show_results:
         st.subheader("Search Specs")
-        selected_make = st.selectbox("MAKE", options=[""] + sorted(df['Make'].dropna().unique().astype(str)))
+        
+        # Dropdowns
+        make_options = [""] + sorted(df['Make'].dropna().unique().astype(str))
+        selected_make = st.selectbox("MAKE", options=make_options)
         
         filtered_by_make = df if not selected_make else df[df['Make'] == selected_make]
-        selected_model = st.selectbox("MODEL", options=[""] + sorted(filtered_by_make['Clean_Model'].unique().astype(str)))
         
-        filtered_by_model = filtered_by_make if not selected_model else filtered_by_make[filtered_by_make['Clean_Model'] == selected_model]
-        selected_year = st.selectbox("YEAR RANGE", options=[""] + sorted(filtered_by_model['Year Range'].unique().astype(str)))
+        model_options = [""] + sorted(filtered_by_make['Clean_Model'].unique().astype(str))
+        selected_model = st.selectbox("MODEL", options=model_options)
+        
+        filtered_by_model = filtered_by_make if not selected_model else filtered_by_make[filtered_by_model['Clean_Model'] == selected_model]
+        
+        year_options = [""] + sorted(filtered_by_model['Year Range'].unique().astype(str))
+        selected_year = st.selectbox("YEAR RANGE", options=year_options)
 
         if st.button("🔍 SEARCH SPECS", use_container_width=True):
             st.session_state.results = filtered_by_model[filtered_by_model['Year Range'] == selected_year] if selected_year else filtered_by_model
             st.session_state.show_results = True
             st.rerun()
+
+    # 5. Display Results
     else:
-        # Results Interface
-        if len(st.session_state.results) == 1:
+        results = st.session_state.results
+        if len(results) == 1:
             st.subheader("Vehicle Details")
-            record = st.session_state.results.iloc[0]
-            for col in st.session_state.results.columns:
+            record = results.iloc[0]
+            for col in results.columns:
                 if col in ['Clean_Model', 'Model', 'Make']: continue
                 st.markdown(f"**{col}:**")
                 st.write(str(record[col]))
         else:
-            st.subheader(f"Found {len(st.session_state.results)} Results")
-            for idx, row in st.session_state.results.iterrows():
+            st.subheader(f"Found {len(results)} Results")
+            for idx, row in results.iterrows():
                 if st.button(f"{row['Make']} | {row['Model']} | {row['Year Range']}", key=str(idx)):
-                    st.session_state.results = st.session_state.results.loc[[idx]]
+                    st.session_state.results = results.loc[[idx]]
                     st.rerun()
         
         if st.button("⬅ Back to Search"):
