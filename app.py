@@ -8,55 +8,54 @@ st.set_page_config(page_title="Recovery Specs", layout="centered")
 # --- DATA HANDLER ---
 @st.cache_data(ttl=600)
 def load_data():
-    # This URL format is a direct CSV export from Google Sheets
-    # It works perfectly with 'Anyone with the link can view'
+    # Direct CSV export URL from your Google Sheet
     url = "https://docs.google.com/spreadsheets/d/1dTq4EZmYsfl4C8zsNYsT1dRwB37Os9RW/gviz/tq?tqx=out:csv&sheet=Sheet1"
     df = pd.read_csv(url)
-    
-    # Clean column names (removes hidden whitespace)
     df.columns = df.columns.str.strip()
     return df
 
-# --- MAIN APP LOGIC ---
+# --- MAIN APP ---
 def main():
-    # 1. Load data safely
+    # Logo Display
+    col1, col2, col3 = st.columns([1, 4, 1]) 
+    with col2:
+        try:
+            st.image("WhatsApp Image 2026-06-09 at 15.53.35.jpeg", use_container_width=True)
+        except:
+            st.warning("Logo image not found in repository.")
+
+    # Data Loading
     try:
         df = load_data()
     except Exception as e:
         st.error(f"Error loading data: {e}")
         return
 
-    # 2. Add 'Clean_Model' for searching if 'Model' exists
+    # Clean Model for search logic
     if 'Model' in df.columns:
         df['Clean_Model'] = df['Model'].apply(lambda x: re.sub(r'\s*\(.*?\)', '', str(x)).strip())
     
-    # 3. Session State Management
+    # State Management
     if 'show_results' not in st.session_state: st.session_state.show_results = False
 
-    # 4. Search UI
+    # Search Logic
     if not st.session_state.show_results:
         st.subheader("Search Specs")
         
-        # Dropdowns
-        make_options = [""] + sorted(df['Make'].dropna().unique().astype(str))
-        selected_make = st.selectbox("MAKE", options=make_options)
-        
+        selected_make = st.selectbox("MAKE", options=[""] + sorted(df['Make'].dropna().unique().astype(str)))
         filtered_by_make = df if not selected_make else df[df['Make'] == selected_make]
         
-        model_options = [""] + sorted(filtered_by_make['Clean_Model'].unique().astype(str))
-        selected_model = st.selectbox("MODEL", options=model_options)
+        selected_model = st.selectbox("MODEL", options=[""] + sorted(filtered_by_make['Clean_Model'].unique().astype(str)))
+        filtered_by_model = filtered_by_make if not selected_model else filtered_by_make[filtered_by_make['Clean_Model'] == selected_model]
         
-        filtered_by_model = filtered_by_make if not selected_model else filtered_by_make[filtered_by_model['Clean_Model'] == selected_model]
-        
-        year_options = [""] + sorted(filtered_by_model['Year Range'].unique().astype(str))
-        selected_year = st.selectbox("YEAR RANGE", options=year_options)
+        selected_year = st.selectbox("YEAR RANGE", options=[""] + sorted(filtered_by_model['Year Range'].unique().astype(str)))
 
         if st.button("🔍 SEARCH SPECS", use_container_width=True):
             st.session_state.results = filtered_by_model[filtered_by_model['Year Range'] == selected_year] if selected_year else filtered_by_model
             st.session_state.show_results = True
             st.rerun()
 
-    # 5. Display Results
+    # Results Logic
     else:
         results = st.session_state.results
         if len(results) == 1:
