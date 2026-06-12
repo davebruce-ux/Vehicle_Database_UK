@@ -9,8 +9,31 @@ st.markdown("""
     <style>
     .stApp { background-color: #000000 !important; }
     h1, h2, h3, h4, p, label { color: #ffffff !important; }
-    div[data-testid="stVerticalBlock"] div.stButton > button { background-color: #f6782a !important; color: white !important; width: 100%; font-weight: bold; }
-    div[data-testid="stButton"] button { background-color: #333333 !important; color: white !important; border: 1px solid #555555; }
+    
+    /* Main Search Button */
+    div[data-testid="stVerticalBlock"] div.stButton > button { 
+        background-color: #f6782a !important; 
+        color: white !important; 
+        width: 100%; 
+        font-weight: bold; 
+    }
+    
+    /* Form Submit Button - Force Contrast for Mobile */
+    div[data-testid="stFormSubmitButton"] button { 
+        background-color: #f6782a !important; 
+        color: #ffffff !important; 
+        border: 2px solid #ffffff !important;
+        width: 100%;
+        font-weight: bold;
+    }
+
+    /* List View Buttons */
+    div[data-testid="stButton"] button { 
+        background-color: #333333 !important; 
+        color: white !important; 
+        border: 1px solid #555555; 
+    }
+
     .result-header { font-size: 1.25em !important; color: #f6782a !important; font-weight: bold; }
     </style>
 """, unsafe_allow_html=True)
@@ -40,7 +63,7 @@ def main():
         filtered_by_make = df if not selected_make else df[df['Make'] == selected_make]
         
         selected_model = st.selectbox("MODEL", options=[""] + sorted(filtered_by_make['Clean_Model'].unique().astype(str)))
-        filtered_by_model = filtered_by_make if not selected_model else filtered_by_make[filtered_by_model['Clean_Model'] == selected_model]
+        filtered_by_model = filtered_by_make if not selected_model else filtered_by_make[filtered_by_make['Clean_Model'] == selected_model]
         
         selected_year = st.selectbox("YEAR RANGE", options=[""] + sorted(filtered_by_model['Year Range'].unique().astype(str)))
 
@@ -50,7 +73,6 @@ def main():
             st.rerun()
             
         st.divider()
-        # RE-ADDED: Missing Vehicle Form
         with st.expander("➕ Report a missing vehicle"):
             with st.form("new_vehicle_form", clear_on_submit=True):
                 make = st.text_input("Make")
