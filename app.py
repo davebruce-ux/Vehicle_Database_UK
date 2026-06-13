@@ -11,7 +11,22 @@ st.markdown("""
     .stApp { background-color: #000000 !important; }
     h1, h2, h3, h4, p, label { color: #ffffff !important; }
     
-    /* Global Styles */
+    /* Global Button Styling - Makes all buttons orange and uniform */
+    div.stButton > button { 
+        background-color: #f6782a !important; 
+        color: white !important; 
+        font-weight: bold; 
+        border: none !important;
+    }
+    
+    /* Submit Form Button Styling */
+    div[data-testid="stFormSubmitButton"] button { 
+        background-color: #f6782a !important; 
+        color: white !important; 
+        font-weight: bold; 
+        border: 2px solid #ffffff !important;
+    }
+
     .result-header { font-size: 1.25em !important; color: #f6782a !important; font-weight: bold; }
     </style>
 """, unsafe_allow_html=True)
@@ -81,7 +96,6 @@ def main():
         else:
             st.subheader(f"Found {len(results)} Results")
             for idx, row in results.iterrows():
-                # use_container_width=True forces uniform full-width buttons
                 if st.button(f"{row['Make']} | {row['Model']} | {row['Year Range']}", key=str(idx), use_container_width=True):
                     st.session_state.results = results.loc[[idx]]
                     st.rerun()
