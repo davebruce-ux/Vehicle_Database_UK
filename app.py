@@ -15,7 +15,7 @@ st.markdown("""
     div[data-testid="stVerticalBlock"] div.stButton > button { 
         background-color: #f6782a !important; 
         color: white !important; 
-        width: 100%; 
+        width: 100% !important; 
         font-weight: bold; 
     }
     
@@ -24,19 +24,21 @@ st.markdown("""
         background-color: #f6782a !important; 
         color: #ffffff !important; 
         border: 2px solid #ffffff !important;
-        width: 100%;
+        width: 100% !important;
         font-weight: bold;
     }
 
-    /* List View Buttons - Uniform Look */
+    /* List View Buttons - Forced Uniform Look */
     div[data-testid="stButton"] button { 
         background-color: #333333 !important; 
         color: white !important; 
-        border: 1px solid #555555;
+        border: 1px solid #555555 !important;
         width: 100% !important; 
+        min-width: 100% !important;
+        max-width: 100% !important;
         text-align: left !important;
-        padding-left: 15px !important;
-        margin-bottom: 5px !important;
+        padding: 10px 15px !important;
+        margin-bottom: 8px !important;
     }
 
     .result-header { font-size: 1.25em !important; color: #f6782a !important; font-weight: bold; }
