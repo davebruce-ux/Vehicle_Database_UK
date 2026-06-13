@@ -11,36 +11,7 @@ st.markdown("""
     .stApp { background-color: #000000 !important; }
     h1, h2, h3, h4, p, label { color: #ffffff !important; }
     
-    /* Main Search Button */
-    div[data-testid="stVerticalBlock"] div.stButton > button { 
-        background-color: #f6782a !important; 
-        color: white !important; 
-        width: 100% !important; 
-        font-weight: bold; 
-    }
-    
-    /* Form Submit Button */
-    div[data-testid="stFormSubmitButton"] button { 
-        background-color: #f6782a !important; 
-        color: #ffffff !important; 
-        border: 2px solid #ffffff !important;
-        width: 100% !important;
-        font-weight: bold;
-    }
-
-    /* List View Buttons - Forced Uniform Look */
-    div[data-testid="stButton"] button { 
-        background-color: #333333 !important; 
-        color: white !important; 
-        border: 1px solid #555555 !important;
-        width: 100% !important; 
-        min-width: 100% !important;
-        max-width: 100% !important;
-        text-align: left !important;
-        padding: 10px 15px !important;
-        margin-bottom: 8px !important;
-    }
-
+    /* Global Styles */
     .result-header { font-size: 1.25em !important; color: #f6782a !important; font-weight: bold; }
     </style>
 """, unsafe_allow_html=True)
@@ -87,7 +58,7 @@ def main():
                 year = st.text_input("Year Range")
                 details = st.text_area("Details")
                 
-                if st.form_submit_button("Send Request"):
+                if st.form_submit_button("Send Request", use_container_width=True):
                     url = "https://script.google.com/macros/s/AKfycbwBAgimuEZD_reXRyS1YETk0Le2-6JiZyYNccQ4fC6RQoLcUwvzTFEAVBBWLH3-jbI6dQ/exec"
                     try:
                         payload = {"make": make, "model": model, "year": year, "details": details}
@@ -110,11 +81,12 @@ def main():
         else:
             st.subheader(f"Found {len(results)} Results")
             for idx, row in results.iterrows():
-                if st.button(f"{row['Make']} | {row['Model']} | {row['Year Range']}", key=str(idx)):
+                # use_container_width=True forces uniform full-width buttons
+                if st.button(f"{row['Make']} | {row['Model']} | {row['Year Range']}", key=str(idx), use_container_width=True):
                     st.session_state.results = results.loc[[idx]]
                     st.rerun()
         
-        if st.button("⬅ Back to Search"):
+        if st.button("⬅ Back to Search", use_container_width=True):
             st.session_state.show_results = False
             st.rerun()
 
