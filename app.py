@@ -19,7 +19,7 @@ st.markdown("""
         font-weight: bold; 
     }
     
-    /* Form Submit Button - Force Contrast for Mobile */
+    /* Form Submit Button */
     div[data-testid="stFormSubmitButton"] button { 
         background-color: #f6782a !important; 
         color: #ffffff !important; 
@@ -28,11 +28,15 @@ st.markdown("""
         font-weight: bold;
     }
 
-    /* List View Buttons */
+    /* List View Buttons - Uniform Look */
     div[data-testid="stButton"] button { 
         background-color: #333333 !important; 
         color: white !important; 
-        border: 1px solid #555555; 
+        border: 1px solid #555555;
+        width: 100% !important; 
+        text-align: left !important;
+        padding-left: 15px !important;
+        margin-bottom: 5px !important;
     }
 
     .result-header { font-size: 1.25em !important; color: #f6782a !important; font-weight: bold; }
