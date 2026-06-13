@@ -11,7 +11,7 @@ st.markdown("""
     .stApp { background-color: #000000 !important; }
     h1, h2, h3, h4, p, label { color: #ffffff !important; }
     
-    /* Global Button Styling - Makes all buttons orange and uniform */
+    /* Global Button Styling - Orange and Uniform */
     div.stButton > button { 
         background-color: #f6782a !important; 
         color: white !important; 
@@ -89,10 +89,28 @@ def main():
         if len(results) == 1:
             st.subheader("Vehicle Details")
             record = results.iloc[0]
-            for col in results.columns:
-                if col in ['Clean_Model', 'Model', 'Make']: continue
-                st.markdown(f'<p class="result-header">{col}:</p>', unsafe_allow_html=True)
-                st.write(str(record[col]))
+            
+            # --- Permanently Visible Info ---
+            st.markdown(f"**Year Range:** {record.get('Year Range', 'N/A')}")
+            st.markdown(f"**Fuel Type:** {record.get('Fuel Type', 'N/A')}")
+            st.markdown(f"**Drivetrain:** {record.get('Drivetrain', 'N/A')}")
+            
+            # --- Expandable Sections ---
+            with st.expander("🔋 Battery Information"):
+                st.markdown(f"**Location:** {record.get('Battery Location', 'N/A')}")
+                st.write("**Photo:** " + str(record.get('Battery Photo', 'N/A')).replace('nan', 'No photo uploaded'))
+
+            with st.expander("🔌 OBD Port Information"):
+                st.markdown(f"**Location:** {record.get('OBD Location', 'N/A')}")
+                st.write("**Photo:** " + str(record.get('ODB Photo', 'N/A')).replace('nan', 'No photo uploaded'))
+                
+            with st.expander("🚗 Jacking Points"):
+                st.markdown(f"**Location:** {record.get('Jacking Points', 'N/A')}")
+                st.write("**Photo:** " + str(record.get('Jacking point Photo', 'N/A')).replace('nan', 'No photo uploaded'))
+            
+            st.divider()
+            st.link_button("📸 ADD PHOTO FOR THIS VEHICLE", "YOUR_GOOGLE_FORM_URL_HERE", use_container_width=True)
+            
         else:
             st.subheader(f"Found {len(results)} Results")
             for idx, row in results.iterrows():
