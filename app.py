@@ -109,7 +109,8 @@ def main():
                 st.write("**Photo:** " + str(record.get('Jacking point Photo', 'N/A')).replace('nan', 'No photo uploaded'))
             
             st.divider()
-            st.link_button("📸 ADD PHOTO FOR THIS VEHICLE", "YOUR_GOOGLE_FORM_URL_HERE", use_container_width=True)
+            # Updated with your actual Form URL
+            st.link_button("📸 ADD PHOTO FOR THIS VEHICLE", "https://forms.gle/dCe6WGz9yiZmjsht8", use_container_width=True)
             
         else:
             st.subheader(f"Found {len(results)} Results")
